@@ -30,9 +30,10 @@ public class JwtAuthenticationFilter implements WebFilter {
 
         // Rutas protegidas (ajústalas según tu proyecto)
         boolean isProductRoute = path.startsWith("/api/products");
+        boolean isOrderRoute   = path.startsWith("/api/orders");
         boolean isPaymentRoute = path.startsWith("/api/payments");
 
-        if (isProductRoute || isPaymentRoute) {
+        if (isProductRoute || isOrderRoute || isPaymentRoute) {
             // Extraer el token del header "Authorization"
             String authHeader = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
             System.out.println(">>> Header Authorization: " + authHeader);
@@ -59,6 +60,12 @@ public class JwtAuthenticationFilter implements WebFilter {
                 // Validar permisos según el rol
                 if (isProductRoute && !role.equals("ROLE_USER") && !role.equals("ROLE_ADMIN")) {
                     System.out.println(">>> Acceso denegado a /api/products para rol: " + role);
+                    exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
+                    return exchange.getResponse().setComplete();
+                }
+
+                if (isOrderRoute && !role.equals("ROLE_ADMIN")) {
+                    System.out.println(">>> Acceso denegado a /api/orders para rol: " + role);
                     exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
                     return exchange.getResponse().setComplete();
                 }

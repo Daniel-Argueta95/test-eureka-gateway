@@ -26,6 +26,7 @@ public class SecurityConfig {
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers("/api/auth/").permitAll()  // Permitir autenticación sin token
                         .pathMatchers("/api/products/").authenticated()
+                        .pathMatchers("/api/orders/").authenticated()
                         .pathMatchers("/api/payments/").authenticated()
                         .anyExchange().permitAll()
                 )
