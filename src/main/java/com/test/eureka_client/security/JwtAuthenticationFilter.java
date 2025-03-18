@@ -18,6 +18,11 @@ import java.security.Key;
 @Component
 public class JwtAuthenticationFilter implements WebFilter {
 
+    @Value("secret.header.key")
+    private  String SECRET_HEADER;
+    @Value("secret.header.value")
+    private  String SECRET_VALUE;
+
     @Value("${jwt.secret}")
     private String secretKey;
 
@@ -47,6 +52,10 @@ public class JwtAuthenticationFilter implements WebFilter {
             String token = authHeader.substring(7);
             try {
                 Key key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
+
+                //esto fue lo nuevo que se agrego
+                request.mutate().header(SECRET_HEADER,SECRET_VALUE);
+
 
                 Claims claims = Jwts.parserBuilder()
                         .setSigningKey(key)
@@ -82,8 +91,11 @@ public class JwtAuthenticationFilter implements WebFilter {
                 exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
                 return exchange.getResponse().setComplete();
             }
+        }else{
+            System.out.println("entro al else");
+            request.mutate().header(SECRET_HEADER,SECRET_VALUE);
         }
 
-        return chain.filter(exchange);
+        return chain.filter(exchange.mutate().request(request).build());
 }
 }
